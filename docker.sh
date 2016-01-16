@@ -51,4 +51,3 @@ if [ $1 = "run" ]; then
 else  
   stop_container $2  
 fi 
-
