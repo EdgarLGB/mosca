@@ -4,3 +4,6 @@
 [submodule "haproxy"]
 	path = haproxy
 	url = https://github.com/EdgarLGB/haproxy.git
+[submodule "mqtt-malaria"]
+	path = mqtt-malaria
+	url = https://github.com/EdgarLGB/mqtt-malaria.git
