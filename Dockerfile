@@ -29,3 +29,4 @@ EXPOSE 1883
 
 
 CMD ["nodejs", "/srv/mosca_server/index"]
+
