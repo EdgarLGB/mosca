@@ -1,3 +1,6 @@
 [submodule "etcd"]
 	path = etcd
 	url = https://github.com/EdgarLGB/etcd.git
+[submodule "haproxy"]
+	path = haproxy
+	url = https://github.com/EdgarLGB/haproxy.git
