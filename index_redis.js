@@ -53,3 +53,4 @@ if (cluster.isMaster) {
 function setup() {
   console.log('Mosca server is up and running')
 }
+
