@@ -1,0 +1,109 @@
+version: "2"
+
+services: 
+    
+    consul:
+        image: progrium/consul
+        ports: 
+          -   "8500:8500"
+        container_name: consul
+        network_mode: "host"
+        hostname: consul
+        volumes:
+          -   /var/lib/container/consul
+        entrypoint:
+          -  /bin/start
+        command:  ["-server", "-bootstrap"]
+    
+    database:
+        image:  lgb452721007/mongodb
+        ports:
+            -   "27017:27017"
+        container_name: database
+        networks:
+          -   backend        
+    
+    mosca1:
+        image:  lgb452721007/mosca
+        ports:
+          -   "1883:1883"
+        container_name: mosca1
+        networks:
+          -   backend
+          -   frontend
+        environment:
+          -   SERVICE_ID=mosca1
+          -   SERVICE_TAGS=mosca
+          -   SERVICE_NAME=mosca1
+    
+    mosca2:
+        image:  lgb452721007/mosca
+        ports:
+          -   "1883:1883"
+        container_name: mosca2
+        networks:
+          -   backend
+          -   frontend
+        environment:
+          -   SERVICE_ID=mosca2
+          -   SERVICE_TAGS=mosca
+          -   SERVICE_NAME=mosca2
+    
+    registrator:
+        image:  gliderlabs/registrator
+        volumes:
+          - /var/run/docker.sock:/tmp/docker.sock
+        network_mode: "host"
+        command:  ["consul://192.168.99.100:8500"]
+    
+    haproxy:
+        image:  lgb452721007/haproxy
+        container_name: haproxy
+        networks:
+          -   frontend
+        ports:  
+          -   "1883:1883"
+    
+    riemannserver:
+        container_name: riemann-server
+        image: nathanleclaire/riemann-server:article
+        networks:  
+          - riemann
+        ports:
+          - "5556:5556"
+        restart:  always
+    
+    riemannhealth:
+        image:  nathanleclaire/riemann-health:article
+        networks: 
+          - riemann
+        pid:  host
+        environment:
+          - "affinity:container!=*riemannhealth*"
+        volumes:
+          - "/etc/hostname:/etc/hostname:ro"
+        restart:  always
+
+    riemanndash:
+        image:  nathanleclaire/riemann-dash:article
+        ports:
+          - "4567:4567"
+        restart:  always
+
+    sematext-agent:
+        image: 'sematext/sematext-agent-docker:latest'
+        environment:
+          - SPM_TOKEN=a021d9ef-09ba-4416-ad44-07cd085c701a        
+          - affinity:container!=sematext-agent* 
+        privileged: true
+        restart: always
+        volumes:
+          - '/var/run/docker.sock:/var/run/docker.sock'
+              
+networks:
+  backend:
+    driver: overlay
+  frontend:
+    driver: overlay
+  riemann:
+    driver: overlay
